@@ -28,9 +28,10 @@ createApp({
         if (!res.ok) throw new Error(`Error ${res.status}`);
         const data = await res.json();
 
-        // TODO: store token (e.g. localStorage.setItem('token', data.token))
-        // TODO: redirect to main page
-        console.log('Login successful', data);
+
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('username', data.username);
+        window.location.href = 'index.html';
       } catch (e) {
         error.value = e.message;
       } finally {
