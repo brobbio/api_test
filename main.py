@@ -2,17 +2,38 @@ import uvicorn
 from fastapi import FastAPI, Request, HTTPException
 from pydantic import BaseModel
 from typing import Optional
+import hashlib
+import secrets
 
 app = FastAPI(
     title="Test API",
     version="0.0.1"
 )
 
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 #Fake db
 items= {}
 next_id = 1
 
-#Fake db schemas
+
+# Fake user store
+users = {
+    "user": hashlib.sha256("password".encode()).hexdigest(),
+}
+ 
+active_tokens = {}  
+
+
+#Requests type classes
 class ItemCreate(BaseModel):
     name: str
     description: Optional[str] = None
@@ -23,7 +44,34 @@ class ItemResponse(BaseModel):
     name: str
     description: Optional[str] = None
 
+
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+ 
+ 
+class LoginResponse(BaseModel):
+    token: str
+    username: str
+
+
 #Endpoints
+
+@app.post("/auth/login", response_model=LoginResponse)
+async def login(credentials: LoginRequest):
+    """Authenticate a user and return a session token."""
+    hashed = hashlib.sha256(credentials.password.encode()).hexdigest()
+    stored = users.get(credentials.username)
+ 
+    if stored is None or not secrets.compare_digest(stored, hashed):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+ 
+    token = secrets.token_hex(32)
+    active_tokens[token] = credentials.username
+    return {"token": token, "username": credentials.username}
+
+
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
