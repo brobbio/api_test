@@ -9,8 +9,13 @@
 </head>
 <body>
 <div id="app">
-  <h1>Items</h1>
-
+    <div class="topbar">
+        <h1>Items</h1>
+        <button class="logout" @click="logout" :disabled="loggingOut">
+            {{ loggingOut ? 'Logging out…' : 'Logout' }}
+        </button>
+    </div>
+    
   <!-- Create -->
   <h2>Add item</h2>
   <input v-model="form.name" placeholder="Name *" />

@@ -14,6 +14,10 @@ createApp({
     const fetchError = ref('');
     const fetchedItem = ref(null);
 
+
+    const loggingOut = ref(false);
+
+
     async function createItem() {
       createError.value = '';
       if (!form.value.name.trim()) {
@@ -61,10 +65,28 @@ createApp({
       }
     }
 
+
+    async function logout() {
+        loggingOut.value = true;
+        const token = localStorage.getItem('token');
+        try {
+          await fetch(`${API}/auth/logout`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` },
+          });
+        } finally {
+          localStorage.removeItem('token');
+          localStorage.removeItem('username');
+          window.location.href = 'login.html';
+        }
+    }
+  
+
     return {
-      form, creating, createError, sessionItems,
-      lookupId, fetching, fetchError, fetchedItem,
-      createItem, fetchItem,
-    };
+        form, creating, createError, sessionItems,
+        lookupId, fetching, fetchError, fetchedItem,
+        loggingOut, logout,
+        createItem, fetchItem,
+      };  
   }
 }).mount('#app');
