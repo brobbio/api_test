@@ -1,9 +1,18 @@
 import uvicorn
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI, Request, HTTPException, Depends
 from pydantic import BaseModel
 from typing import Optional
 import hashlib
 import secrets
+from sqlalchemy.orm import Session
+from sqlalchemy.orm import declarative_base
+
+Base = declarative_base()
+
+
+from repository import insert_item, save_db
+from db import get_engine, SessionLocal, get_db, engine
+from models import ItemsData
 
 app = FastAPI(
     title="Test API",
@@ -14,9 +23,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],
+    allow_methods=["GET", "POST", "DELETE"],
+    allow_headers=["Content-Type", "Authorization"],
 )
 
 #Fake db
@@ -83,33 +92,52 @@ async def logout(request: Request):
     del active_tokens[token]
 
 
-
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}
 
 
 @app.get("/items")
-async def read_items():
+async def read_items(
+    limit: int = 10,
+    offset: int = 0,
+    db: Session = Depends(get_db)
+):
     """Retrieve every item."""
-    return items
+    return (
+        db.query(ItemsData)
+        .offset(offset)
+        .limit(limit)
+        .all()
+    )
 
 
 @app.get("/items/{item_id}", response_model=ItemResponse)
-async def read_item(item_id: int):
+async def read_item(item_id: int, db: Session = Depends(get_db)):
     """Retrieve a single item by ID."""
-    if item_id not in items:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return items[item_id]
+    item = (
+        db.query(ItemsData)
+        .filter(ItemsData.id == item_id)
+        .first()
+    )
+
+    if item is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Item not found"
+        )
+
+    return item
  
  
 @app.post("/items", response_model=ItemResponse, status_code=201)
-async def create_item(item: ItemCreate):
+async def create_item(item: ItemCreate, db: Session = Depends(get_db)):
     """Create a new item."""
-    global next_id
-    new_item = {"id": next_id, "name": item.name, "description": item.description}
-    items[next_id] = new_item
-    next_id += 1
+    new_item = ItemsData(name=item.name, description=item.description)
+    db.add(new_item)
+    db.commit()
+    db.refresh(new_item)
+    
     return new_item
 
 

@@ -1,4 +1,4 @@
-const { createApp, ref } = Vue;
+const { createApp, ref, onMounted } = Vue;
 
 const API = 'http://localhost:8000';
 
@@ -14,9 +14,12 @@ createApp({
     const fetchError = ref('');
     const fetchedItem = ref(null);
 
+    const currentPage = ref(1);
+    const pageSize = 10;
 
     const loggingOut = ref(false);
 
+    onMounted(loadItems);
 
     async function createItem() {
       createError.value = '';
@@ -41,6 +44,7 @@ createApp({
       } catch (e) {
         createError.value = e.message;
       } finally {
+        await loadItems();
         creating.value = false;
       }
     }
@@ -65,6 +69,26 @@ createApp({
       }
     }
 
+    async function loadItems() {
+    
+      const offset = (currentPage.value - 1) * pageSize;
+      const response = await fetch(
+        `${API}/items?limit=${pageSize}&offset=${offset}`
+      );
+      sessionItems.value = await response.json();
+    }
+
+    async function nextPage() {
+      currentPage.value++;
+      await loadItems();
+    }
+  
+    async function previousPage() {
+        if (currentPage.value > 1) {
+            currentPage.value--;
+            await loadItems();
+        }
+    }
 
     async function logout() {
         loggingOut.value = true;
@@ -87,6 +111,8 @@ createApp({
         lookupId, fetching, fetchError, fetchedItem,
         loggingOut, logout,
         createItem, fetchItem,
+        nextPage, previousPage,
+        currentPage, pageSize
       };  
   }
 }).mount('#app');
