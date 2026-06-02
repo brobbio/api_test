@@ -4,7 +4,7 @@ setup(
     name="items-api",
     version="0.1.0",
     description="Webapp to store items",
-    package_dir={"": "."},
+    package_dir={"": "src"},
     author="",
     packages=find_packages(where="."),
     python_requires=">=3.8",
