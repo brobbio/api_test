@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:15
+    container_name: items-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: items
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./sql:/docker-entrypoint-initdb.d
+      - pg_data:/var/lib/postgresql/data
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8080:80"
+
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes: 
+      - ./data:/app/data
+    container_name: items-app
+    depends_on:
+      - db
+    environment:
+      OUTPUT_BASE_DIR: "/app/data"
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: items
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_URL: postgresql+psycopg://postgres:postgres@db:5432/items
+
+
+volumes:
+  pg_data:
