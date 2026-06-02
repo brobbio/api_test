@@ -14,9 +14,9 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5500", "http://127.0.0.1:5500"],
-    allow_methods=["GET", "POST", "DELETE"],
-    allow_headers=["Content-Type", "Authorization"],
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 #Fake db
@@ -72,9 +72,12 @@ async def login(credentials: LoginRequest):
 
 
 @app.delete("/auth/logout", status_code=204)
-async def logout(authorization):
+async def logout(request: Request):
     """Invalidate the current session token."""
-    token = authorization.removeprefix("Bearer ").strip()
+    auth = request.headers.get("Authorization", "")
+    if auth.startswith("Bearer "):
+        token = auth[len("Bearer "):].strip()
+        
     if token not in active_tokens:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     del active_tokens[token]
