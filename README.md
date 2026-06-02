@@ -35,26 +35,25 @@ A simple full-stack application for storing and retrieving items. The project co
 
 ```text
 .
-├── app/
+├── src/
 │   ├── main.py
-│   ├── models/
-│   ├── routes/
-│   ├── db/
-│   └── auth/
+│   ├── models.py
+│   ├── routes.py
+│   └── db.py
 ├── sql/
 │   └── schema.sql
-├── static/
+├── frontend/
 │   ├── index.html
 │   ├── app.js
 │   ├── style.css
 │   ├── login.html
-│   ├── login.js
-│   └── login.css
+│   └── login.js
 ├── tests/
 │   └── endpoint_tests.py
 ├── docker-compose.yml
 ├── Dockerfile
-├── requirements.txt
+├── setup.py
+├── entrypoint.sh
 └── README.md
 ```
 
