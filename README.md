@@ -1,74 +1,163 @@
 # Items App
 
-A simple full-stack items storage/retrieval web app with a FastAPI backend and a Vue.js frontend.
+A simple full-stack application for storing and retrieving items. The project consists of a FastAPI backend, a PostgreSQL database, and a Vue.js frontend served as static files.
 
-## Stack
+## Features
 
-- **Backend**: FastAPI + PyJWT
-- **Frontend**: Vue 3 (CDN, no build step)
+* JWT-based authentication
+* Item creation and retrieval
+* Paginated item listing
+* PostgreSQL persistence
+* Dockerized deployment with Docker Compose
+* Automated database schema initialization
+* Backend endpoint tests with pytest
 
-## Project structure
+## Technology Stack
 
+### Backend
+
+* FastAPI
+* SQLAlchemy
+* PostgreSQL
+* JWT Authentication
+
+### Frontend
+
+* Vue 3 (CDN, no build step)
+* HTML/CSS/JavaScript
+
+### Infrastructure
+
+* Docker
+* Docker Compose
+
+## Project Structure
+
+```text
+.
+├── app/
+│   ├── main.py
+│   ├── models/
+│   ├── routes/
+│   ├── db/
+│   └── auth/
+├── sql/
+│   └── schema.sql
+├── static/
+│   ├── index.html
+│   ├── app.js
+│   ├── style.css
+│   ├── login.html
+│   ├── login.js
+│   └── login.css
+├── tests/
+│   └── endpoint_tests.py
+├── docker-compose.yml
+├── Dockerfile
+├── requirements.txt
+└── README.md
 ```
-├── main.py           # FastAPI app
-├── auth.js           # Shared auth logic (token storage, logout)
-├── index.html        # Main page (add and look up items)
-├── app.js
-├── style.css
-├── login.html        # Login page
-├── login.js
-├── login.css
-├── test_unit.py      # Unit tests (no server needed)
-├── test_integration.py
-└── requirements.txt
-```
 
-## Setup
+> The exact structure may vary slightly depending on the current implementation.
+
+## Running the Application
+
+Start the entire stack:
 
 ```bash
-pip install -r requirements.txt
+docker compose up --build
 ```
 
-## Running
+This will start:
+
+* FastAPI backend
+* PostgreSQL database
+* Frontend assets
+
+## Database Initialization
+
+The PostgreSQL container automatically initializes the database schema from:
+
+```text
+sql/schema.sql
+```
+
+during first startup.
+
+If you need to recreate the database from scratch:
 
 ```bash
-# Start the backend
-uvicorn main:app --reload
-
-# Open the frontend
-# Serve index.html on port 5500 (e.g. VS Code Live Server)
+docker compose down -v
+docker compose up --build
 ```
 
-API docs available at `http://localhost:8000/docs`.
+## Accessing the Application
 
-## API endpoints
+| Service     | URL                        |
+| ----------- | -------------------------- |
+| Frontend    | http://localhost:8080      |
+| Backend API | http://localhost:8000      |
+| Swagger UI  | http://localhost:8000/docs |
 
-| Method | Path | Description |
-|---|---|---|
-| `POST` | `/auth/login` | Login, returns a JWT |
-| `DELETE` | `/auth/logout` | Logout (validates token) |
-| `GET` | `/items/{id}` | Get an item by ID |
-| `POST` | `/items` | Create an item |
+## API Endpoints
 
-## Auth
+### Authentication
 
-JWT-based. Tokens expire after **1 hour**. On login the token is stored in `localStorage` and sent as `Authorization: Bearer <token>` on subsequent requests.
+| Method | Endpoint       | Description                             |
+| ------ | -------------- | --------------------------------------- |
+| POST   | `/auth/login`  | Authenticate and receive a JWT          |
+| DELETE | `/auth/logout` | Logout and invalidate the current token |
 
-> **Note**: logout does not invalidate the token server-side — it will remain valid until expiry. A denylist is needed for true invalidation.
+### Items
 
-## Test users
+| Method | Endpoint      | Description                        |
+| ------ | ------------- | ---------------------------------- |
+| GET    | `/items`      | Retrieve a paginated list of items |
+| GET    | `/items/{id}` | Retrieve a single item by ID       |
+| POST   | `/items`      | Create a new item                  |
+
+### Pagination
+
+The list endpoint supports pagination via query parameters:
+
+```http
+GET /items?limit=10&offset=0
+```
+
+Example:
+
+```http
+GET /items?limit=10&offset=20
+```
+
+returns items 21–30.
+
+## Test User
 
 | Username | Password |
-|---|---|
-| alice | password123 |
+| -------- | -------- |
+| user     | password |
 
-## Running tests
+## Running Tests
+
+Run the backend tests from the application container:
 
 ```bash
-# Unit tests (no server needed)
-pytest test_unit.py -v
+docker exec -it items-app pytest -v
+```
 
-# Integration tests (requires running server)
-uvicorn main:app --port 8000
-pytest test_integration.py -v
+Or execute a specific test file:
+
+```bash
+docker exec -it items-app pytest tests/endpoint_tests.py -v
+```
+
+## Example Workflow
+
+1. Log in using the test credentials.
+2. Create one or more items.
+3. View stored items in the frontend.
+4. Navigate through paginated results using the Previous and Next controls.
+5. Inspect the API using Swagger at `/docs`.
+
 ```
