@@ -4,7 +4,7 @@ setup(
     name="items-api",
     version="0.2.0",
     description="Webapp to store items",
-    package_dir={"": "."},
+    package_dir={"": "src"},
     author="",
     packages=find_packages(where="."),
     python_requires=">=3.8",
@@ -14,6 +14,8 @@ setup(
         "psycopg[binary]",
         "fastapi>=0.124.4",
         "uvicorn>=0.33.0",
+        "pytest",
+        "httpx",
     ],
     entry_points={
         "console_scripts": [
