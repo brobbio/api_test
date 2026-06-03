@@ -142,12 +142,6 @@ returns items 21–30.
 Run the backend tests from the application container:
 
 ```bash
-docker exec -it items-app pytest -v
-```
-
-Or execute a specific test file:
-
-```bash
 docker exec -it items-app pytest tests/endpoint_tests.py -v
 ```
 
