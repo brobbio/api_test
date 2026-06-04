@@ -1,6 +1,7 @@
 """DB initialization utilities"""
 import os
-from sqlalchemy import Engine, create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 DEFAULT_DB_URL = "postgresql+psycopg://postgres:postgres@localhost:5432/items"

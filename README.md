@@ -1,3 +1,5 @@
+<<<<<<< Updated upstream
+=======
 # Items App
 
 A simple full-stack application for storing and retrieving items. The project consists of a FastAPI backend, a PostgreSQL database, and a Vue.js frontend served as static files.
@@ -37,8 +39,10 @@ A simple full-stack application for storing and retrieving items. The project co
 .
 ├── src/
 │   ├── main.py
-│   ├── models.py
-│   ├── routes.py
+│   ├── models
+│   ├── routers
+│   ├── schema
+│   ├── services
 │   └── db.py
 ├── sql/
 │   └── schema.sql
@@ -56,8 +60,6 @@ A simple full-stack application for storing and retrieving items. The project co
 ├── entrypoint.sh
 └── README.md
 ```
-
-> The exact structure may vary slightly depending on the current implementation.
 
 ## Running the Application
 
@@ -154,3 +156,4 @@ docker exec -it items-app pytest tests/endpoint_tests.py -v
 5. Inspect the API using Swagger at `/docs`.
 
 ```
+>>>>>>> Stashed changes
