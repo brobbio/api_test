@@ -22,13 +22,5 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-# Fake user store
-users = {
-    "user": hashlib.sha256("password".encode()).hexdigest(),
-}
-
-active_tokens = {}  
-
 if __name__ == "__main__":
     uvicorn.run(app, port=8050)

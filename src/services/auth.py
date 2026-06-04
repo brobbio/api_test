@@ -1,6 +1,16 @@
 from sqlalchemy.orm import Session
-from src.schemas.user import LoginRequest, LoginResponse
+from fastapi import HTTPException
 import secrets
+import hashlib
+
+from src.schemas.user import LoginRequest, LoginResponse
+
+# Fake user store
+users = {
+    "user": hashlib.sha256("password".encode()).hexdigest(),
+}
+
+active_tokens = {}  
 
 def login(username, password):
     hashed = hashlib.sha256(password.encode()).hexdigest()
