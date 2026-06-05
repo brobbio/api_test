@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 # Items App
 
 A simple full-stack application for storing and retrieving items. The project consists of a FastAPI backend, a PostgreSQL database, and a Vue.js frontend served as static files.
