@@ -6,7 +6,7 @@ setup(
     description="Webapp to store items",
     package_dir={"": "src"},
     author="",
-    packages=find_packages(where="."),
+    packages=find_packages(where=".", exclude=["tests", "test*"]),
     python_requires=">=3.8",
     install_requires=[
         "requests>=2.31.0",
