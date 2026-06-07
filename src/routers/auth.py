@@ -11,9 +11,3 @@ async def login(credentials: LoginRequest):
     """Authenticate a user and return a session token."""
     return user_service.login(credentials.username, credentials.password)
 
-
-@router.delete("/logout", status_code=204)
-async def logout(request: Request):
-    """Invalidate the current session token."""
-    token = request.headers.get("Authorization", "")
-    user_service.logout(token)
