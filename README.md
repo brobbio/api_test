@@ -42,8 +42,6 @@ A simple full-stack application for storing and retrieving items. The project co
 │   ├── schema
 │   ├── services
 │   └── db.py
-├── sql/
-│   └── schema.sql
 ├── frontend/
 │   ├── index.html
 │   ├── app.js
@@ -51,10 +49,10 @@ A simple full-stack application for storing and retrieving items. The project co
 │   ├── login.html
 │   └── login.js
 ├── tests/
-│   └── endpoint_tests.py
+│   └── test_items.py
 ├── docker-compose.yml
 ├── Dockerfile
-├── setup.py
+├── pyproject.toml
 ├── entrypoint.sh
 └── README.md
 ```
@@ -98,7 +96,6 @@ docker compose up --build
 | Backend API | http://localhost:8000      |
 | Swagger UI  | http://localhost:8000/docs |
 
-## API Endpoints
 
 ### Authentication
 
@@ -139,10 +136,10 @@ returns items 21–30.
 
 ## Running Tests
 
-Run the backend tests from the application container:
+Run the backend tests from the app root directory:
 
 ```bash
-docker exec -it items-app pytest tests/endpoint_tests.py -v
+pytest
 ```
 
 ## Example Workflow

@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from src.main import app
 
+
 client = TestClient(app)
 
 def test_create_item():
@@ -48,3 +49,15 @@ def test_create_and_retrieve_item():
 
     assert get_response.status_code == 200
     assert get_response.json()["id"] == item_id
+
+def test_get_item_not_found():
+    response = client.get("/items/99999")
+    assert response.status_code == 404
+
+def test_create_item_missing_name():
+    response = client.post("/items", json={"description": "No name"})
+    assert response.status_code == 422
+
+def test_get_items_empty():
+    response = client.get("/items")
+    assert response.json() == []

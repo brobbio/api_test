@@ -2,8 +2,8 @@
 
 from sqlalchemy import Column, Integer, Text, Date, Float, JSON, UniqueConstraint
 from sqlalchemy.orm import declarative_base
+from src.db import Base
 
-Base = declarative_base()
 
 class ItemsData(Base):
     """Items data model"""
