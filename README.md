@@ -154,4 +154,3 @@ docker exec -it items-app pytest tests/endpoint_tests.py -v
 5. Inspect the API using Swagger at `/docs`.
 
 ```
->>>>>>> Stashed changes
