@@ -11,5 +11,5 @@ class ItemsData(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(Text, nullable=False)
-    description = Column(Text, nullable=False)
+    description = Column(Text, nullable=True)
     
