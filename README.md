@@ -41,6 +41,7 @@ A simple full-stack application for storing and retrieving items. The project co
 │   ├── routers
 │   ├── schema
 │   ├── services
+│   ├── dependencies.py
 │   └── db.py
 ├── frontend/
 │   ├── index.html
@@ -73,13 +74,7 @@ This will start:
 
 ## Database Initialization
 
-The PostgreSQL container automatically initializes the database schema from:
-
-```text
-sql/schema.sql
-```
-
-during first startup.
+The PostgreSQL container automatically initializes the database during first startup.
 
 If you need to recreate the database from scratch:
 
