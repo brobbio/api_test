@@ -1,3 +1,6 @@
+if (!sessionStorage.getItem('token')) {
+  window.location.replace('login.html');
+}
 const { createApp, ref, onMounted } = Vue;
 
 const API = 'http://localhost:8000';
@@ -13,14 +16,18 @@ createApp({
     const fetching = ref(false);
     const fetchError = ref('');
     const fetchedItem = ref(null);
-
+    
     const currentPage = ref(1);
     const pageSize = 10;
 
+    const isAuthenticated = ref(false);
     const loggingOut = ref(false);
 
-    onMounted(loadItems);
+    
+    isAuthenticated.value = true;
 
+    onMounted(loadItems);
+    
     async function createItem() {
       createError.value = '';
       if (!form.value.name.trim()) {
@@ -31,7 +38,7 @@ createApp({
       try {
         const res = await fetch(`${API}/items`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: authHeaders(),
           body: JSON.stringify({
             name: form.value.name.trim(),
             description: form.value.description.trim() || null,
@@ -49,6 +56,13 @@ createApp({
       }
     }
 
+    function authHeaders() {
+      return {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+      };
+    }
+
     async function fetchItem() {
       fetchError.value = '';
       fetchedItem.value = null;
@@ -58,7 +72,9 @@ createApp({
       }
       fetching.value = true;
       try {
-        const res = await fetch(`${API}/items/${lookupId.value}`);
+        const res = await fetch(`${API}/items/${lookupId.value}`, {
+          headers: authHeaders(),
+        });
         if (res.status === 404) throw new Error('Item not found.');
         if (!res.ok) throw new Error(`Error ${res.status}`);
         fetchedItem.value = await res.json();
@@ -72,9 +88,11 @@ createApp({
     async function loadItems() {
     
       const offset = (currentPage.value - 1) * pageSize;
+      console.log(authHeaders());
       const response = await fetch(
-        `${API}/items?limit=${pageSize}&offset=${offset}`
-      );
+        `${API}/items/?limit=${pageSize}&offset=${offset}`, {
+        headers: authHeaders(),
+      });
       sessionItems.value = await response.json();
     }
 
@@ -92,17 +110,10 @@ createApp({
 
     async function logout() {
         loggingOut.value = true;
-        const token = localStorage.getItem('token');
-        try {
-          await fetch(`${API}/auth/logout`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-        } finally {
-          localStorage.removeItem('token');
-          localStorage.removeItem('username');
-          window.location.href = 'login.html';
-        }
+        const token = sessionStorage.getItem('token');
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('username');
+        window.location.href = 'login.html';
     }
   
 
@@ -112,7 +123,8 @@ createApp({
         loggingOut, logout,
         createItem, fetchItem,
         nextPage, previousPage,
-        currentPage, pageSize
+        currentPage, pageSize,
+        isAuthenticated, authHeaders
       };  
   }
 }).mount('#app');
