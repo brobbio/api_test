@@ -10,6 +10,7 @@ dependencies = [
     "requests>=2.31.0",
     "sqlalchemy>=2.0",
     "psycopg[binary]",
+    "pyjwt>=2.9.0",
 ]
 
 [project.optional-dependencies]
