@@ -38,8 +38,8 @@ A simple full-stack application for storing and retrieving items. The project co
 ├── src/
 │   ├── main.py
 │   ├── models
-│   ├── routes
-│   ├── schemas
+│   ├── routers
+│   ├── schema
 │   ├── services
 │   └── db.py
 ├── frontend/
@@ -49,10 +49,10 @@ A simple full-stack application for storing and retrieving items. The project co
 │   ├── login.html
 │   └── login.js
 ├── tests/
-│   └── endpoint_tests.py
+│   └── test_items.py
 ├── docker-compose.yml
 ├── Dockerfile
-├── setup.py
+├── pyproject.toml
 ├── entrypoint.sh
 └── README.md
 ```
@@ -136,7 +136,7 @@ returns items 21–30.
 
 ## Running Tests
 
-Run the application tests from the app directory:
+Run the backend tests from the app root directory:
 
 ```bash
 pytest
