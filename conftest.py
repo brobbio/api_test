@@ -7,6 +7,7 @@ import os
 os.environ["DB_URL"] = "sqlite:///./test.db"
 
 from src.db import get_db, Base, get_engine
+from src.dependencies import require_auth
 
 
 # engine = create_engine(SQLALCHEMY_TEST_URL, connect_args={"check_same_thread": False})
@@ -22,6 +23,8 @@ def override_get_db():
         db.close()
 
 app.dependency_overrides[get_db] = override_get_db
+
+app.dependency_overrides[require_auth] = lambda: "test-user"
 
 
 @pytest.fixture(autouse=True)
