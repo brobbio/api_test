@@ -2,6 +2,7 @@ from typing import List
 from fastapi import Depends
 from sqlalchemy.orm import Session
 from src.models.item import ItemsData
+from src.models.user import User
 from src.schemas.items import ItemCreate
 from src.db import get_db
 
