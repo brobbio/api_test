@@ -44,7 +44,10 @@ createApp({
             description: form.value.description.trim() || null,
           }),
         });
-        if (!res.ok) throw new Error(`Error ${res.status}`);
+        if (!res.ok) {
+          const error = await res.json();
+          throw new Error(error.detail || `Error ${res.status}`);
+        }
         const item = await res.json();
         sessionItems.value.unshift(item);
         form.value = { name: '', description: '' };

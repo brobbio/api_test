@@ -7,7 +7,7 @@ from src.services import auth as user_service
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post("/login", response_model=LoginResponse)
-async def login(credentials: LoginRequest):
+async def login(credentials: LoginRequest, db: Session = Depends(get_db)):
     """Authenticate a user and return a session token."""
-    return user_service.login(credentials.username, credentials.password)
+    return user_service.login(credentials.username, credentials.password, db)
 

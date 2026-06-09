@@ -4,16 +4,20 @@ from sqlalchemy.orm import Session
 from src.db import get_db
 from src.schemas.items import ItemCreate, ItemResponse
 from src.services import items as item_service
-from src.dependencies import require_auth
+from src.dependencies import require_auth, require_create_permission
 
 router = APIRouter(prefix="/items", tags=["items"])
 
 @router.get("/", response_model=List[ItemResponse])
-def list_items(db: Session = Depends(get_db), limit: int = 10, offset: int = 0, username: str = Depends(require_auth)):
+def list_items(db: Session = Depends(get_db), limit: int = 10, offset: int = 0):
     return item_service.get_items(db, limit, offset)
 
-@router.post("/", response_model=ItemResponse, status_code=201)
-def create_item(payload: ItemCreate, db: Session = Depends(get_db), username: str = Depends(require_auth)):
+@router.post("/", 
+        response_model=ItemResponse,
+        status_code=201,
+        dependencies = [Depends(require_auth), Depends(require_create_permission)],
+    )
+def create_item(payload: ItemCreate, db: Session = Depends(get_db)):
     return item_service.create_item(payload, db)
 
 @router.get("/{item_id}", response_model=ItemResponse)
