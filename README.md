@@ -4,32 +4,46 @@ A simple full-stack application for storing and retrieving items. The project co
 
 ## Features
 
-* JWT-based authentication
-* Item creation and retrieval
-* Paginated item listing
-* PostgreSQL persistence
-* Dockerized deployment with Docker Compose
-* Automated database schema initialization
-* Backend endpoint tests with pytest
+- JWT-based authentication
+- Role-based authorization (RBAC)
+- Item creation and retrieval
+- Paginated item listing
+- PostgreSQL persistence
+- Automatic database schema creation
+- Automatic seeding of default users
+- Dockerized deployment with Docker Compose
+- Backend endpoint tests with pytest
+
+## Authorization Model
+
+The application defines two user roles:
+
+| Role | Permissions |
+|--------|-------------|
+| maintainer | Create and view items |
+| clerk | View items only |
+
+Authorization is enforced at the API layer using FastAPI dependencies.
 
 ## Technology Stack
 
 ### Backend
 
-* FastAPI
-* SQLAlchemy
-* PostgreSQL
-* JWT Authentication
+- FastAPI
+- SQLAlchemy
+- PostgreSQL
+- JWT Authentication
+- Pytest
 
 ### Frontend
 
-* Vue 3 (CDN, no build step)
-* HTML/CSS/JavaScript
+- Vue 3 (CDN, no build step)
+- HTML/CSS/JavaScript
 
 ### Infrastructure
 
-* Docker
-* Docker Compose
+- Docker
+- Docker Compose
 
 ## Project Structure
 
@@ -37,10 +51,10 @@ A simple full-stack application for storing and retrieving items. The project co
 .
 ├── src/
 │   ├── main.py
-│   ├── models
-│   ├── routers
-│   ├── schema
-│   ├── services
+│   ├── models/
+│   ├── routers/
+│   ├── schema/
+│   ├── services/
 │   ├── dependencies.py
 │   └── db.py
 ├── frontend/
@@ -60,56 +74,71 @@ A simple full-stack application for storing and retrieving items. The project co
 
 ## Running the Application
 
-Start the entire stack:
+Start the complete stack:
 
 ```bash
 docker compose up --build
 ```
 
-This will start:
+This launches:
 
-* FastAPI backend
-* PostgreSQL database
-* Frontend assets
+- FastAPI backend
+- PostgreSQL database
+- Frontend static assets
 
 ## Database Initialization
 
-The PostgreSQL container automatically initializes the database during first startup.
+On startup, the application:
 
-If you need to recreate the database from scratch:
+1. Creates all required database tables.
+2. Seeds default users if they do not already exist.
+
+To recreate the database from scratch:
 
 ```bash
 docker compose down -v
 docker compose up --build
 ```
 
+## Default Users
+
+The application automatically creates the following users:
+
+| Username | Password | Role |
+|----------|----------|------|
+| user_maintainer | password | maintainer |
+| user_clerk | password | clerk |
+
+> The maintainer user can create and view items. The clerk user can only view items.
+
 ## Accessing the Application
 
-| Service     | URL                        |
-| ----------- | -------------------------- |
-| Frontend    | http://localhost:8080      |
-| Backend API | http://localhost:8000      |
-| Swagger UI  | http://localhost:8000/docs |
+| Service | URL |
+|----------|-----|
+| Frontend | http://localhost:8080 |
+| Backend API | http://localhost:8000 |
+| Swagger UI | http://localhost:8000/docs |
 
+## API Endpoints
 
 ### Authentication
 
-| Method | Endpoint       | Description                             |
-| ------ | -------------- | --------------------------------------- |
-| POST   | `/auth/login`  | Authenticate and receive a JWT          |
+| Method | Endpoint | Description |
+|----------|----------|-------------|
+| POST | `/auth/login` | Authenticate and receive a JWT |
 | DELETE | `/auth/logout` | Logout and invalidate the current token |
 
 ### Items
 
-| Method | Endpoint      | Description                        |
-| ------ | ------------- | ---------------------------------- |
-| GET    | `/items`      | Retrieve a paginated list of items |
-| GET    | `/items/{id}` | Retrieve a single item by ID       |
-| POST   | `/items`      | Create a new item                  |
+| Method | Endpoint | Authorization | Description |
+|----------|----------|---------------|-------------|
+| GET | `/items` | clerk, maintainer | Retrieve a paginated list of items |
+| GET | `/items/{id}` | clerk, maintainer | Retrieve a single item |
+| POST | `/items` | maintainer only | Create a new item |
 
-### Pagination
+## Pagination
 
-The list endpoint supports pagination via query parameters:
+The item list endpoint supports pagination through query parameters:
 
 ```http
 GET /items?limit=10&offset=0
@@ -121,28 +150,43 @@ Example:
 GET /items?limit=10&offset=20
 ```
 
-returns items 21–30.
-
-## Test User
-
-| Username | Password |
-| -------- | -------- |
-| user     | password |
+Returns items 21–30.
 
 ## Running Tests
 
-Run the backend tests from the app root directory:
+Run backend tests from the project root:
 
 ```bash
 pytest
 ```
 
+The test suite covers:
+
+- Authentication
+- Authorization
+- Item creation
+- Item retrieval
+- API response validation
+
 ## Example Workflow
 
-1. Log in using the test credentials.
-2. Create one or more items.
-3. View stored items in the frontend.
-4. Navigate through paginated results using the Previous and Next controls.
-5. Inspect the API using Swagger at `/docs`.
+### Maintainer Workflow
 
-```
+1. Log in as `user_maintainer`.
+2. Create one or more items.
+3. View items from the frontend.
+4. Navigate paginated results using the Previous and Next controls.
+5. Explore the API through Swagger UI at `/docs`.
+
+### Clerk Workflow
+
+1. Log in as `user_clerk`.
+2. View existing items.
+3. Attempting to create an item will result in a `403 Forbidden` response due to insufficient permissions.
+
+## Security Notes
+
+- Passwords are stored as hashes.
+- Authentication is handled using JWT tokens.
+- Protected endpoints require a valid Bearer token.
+- Authorization is enforced using role-based permissions.
