@@ -24,14 +24,25 @@ def get_user_role(username: str, db: Session):
         .first()
     )
 
+def get_user_password(username: str, db: Session):
+    return (
+        db.query(User)
+        .filter(User.username == username)
+        .first()
+    )
+
 def login(username, password, db):
     hashed = hashlib.sha256(password.encode()).hexdigest()
-    stored = users.get(username)
+    stored = get_user_password(username, db)
  
-    if stored is None or not secrets.compare_digest(stored, hashed):
+    if stored is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
-    role = get_user_role(username, db)
+    stored_pass = stored.password_hash
+    if stored_pass is None or not secrets.compare_digest(stored_pass, hashed):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+    role = get_user_role(username, db).role
  
     if role is None:
         raise HTTPException(status_code=401, detail="Invalid credentials")
@@ -44,7 +55,7 @@ def login(username, password, db):
 def get_current_user(token):
     try:
         payload = jwt.decode(token, SECRET, algorithms=["HS256"])
-        return payload["sub"]
+        return payload
     except jwt.ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token expired")
     except jwt.InvalidTokenError:

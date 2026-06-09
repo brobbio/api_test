@@ -1,7 +1,7 @@
 import uvicorn
+import hashlib
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
-import hashlib
 from contextlib import asynccontextmanager
 from pydantic import BaseModel
 from sqlalchemy.orm import Session, declarative_base, sessionmaker
@@ -16,12 +16,12 @@ def seed_users(db: Session):
     users = [
         {
             "username": "user_maintainer",
-            "password_hash": "hashed_password_here",
+            "password_hash": hashlib.sha256("maintainer_password".encode()).hexdigest(),
             "role": "maintainer",
         },
         {
             "username": "user_clerk",
-            "password_hash": "hashed_password_here",
+            "password_hash": hashlib.sha256("clerk_password".encode()).hexdigest(),
             "role": "clerk",
         },
     ]
