@@ -7,13 +7,19 @@ import os
 os.environ["DB_URL"] = "sqlite:///./test.db"
 
 from src.db import get_db, Base, get_engine
-from src.dependencies import require_auth
+from src.dependencies import require_auth, require_create_permission
 
 
 # engine = create_engine(SQLALCHEMY_TEST_URL, connect_args={"check_same_thread": False})
 TestingSessionLocal = sessionmaker(bind=get_engine())
 
 Base.metadata.create_all(bind=get_engine())
+
+def override_create_permission():
+    return {
+        "sub": "test_user",
+        "role": "maintainer",
+    }
 
 def override_get_db():
     db = TestingSessionLocal()
@@ -25,7 +31,7 @@ def override_get_db():
 app.dependency_overrides[get_db] = override_get_db
 
 app.dependency_overrides[require_auth] = lambda: "test-user"
-
+app.dependency_overrides[require_create_permission] = override_create_permission
 
 @pytest.fixture(autouse=True)
 def reset_db():
