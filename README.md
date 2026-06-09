@@ -106,8 +106,8 @@ The application automatically creates the following users:
 
 | Username | Password | Role |
 |----------|----------|------|
-| user_maintainer | password | maintainer |
-| user_clerk | password | clerk |
+| user_maintainer | maintainer_password | maintainer |
+| user_clerk | clerk_password | clerk |
 
 > The maintainer user can create and view items. The clerk user can only view items.
 
